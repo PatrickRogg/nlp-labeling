@@ -12,11 +12,9 @@
         Fähigkeit
       </button>
       <span class="px-2"></span>
-      <button class="btn btn-sm btn-light" (click)="label('O')">
-        Anderes
-      </button>
-      <br>
-      <br>
+      <button class="btn btn-sm btn-light" (click)="label('O')">Anderes</button>
+      <br />
+      <br />
       <button
         class="btn btn-sm btn-secondary"
         (click)="this.selectionStart = null; this.selectionEnd = null"
@@ -24,17 +22,6 @@
         Zurücksetzen
       </button>
       <br />
-      <br>
-      <button
-        class="btn btn-sm btn-danger"
-        (click)="deleteSentence(currentSentenceDoc)"
-      >
-        Löschen
-      </button>
-      <span class="px-2"></span>
-      <button class="btn btn-sm btn-primary" (click)="addLabeledSentence()">
-        Speichern
-      </button>
     </div>
   </div>
   <div class="row">
@@ -59,5 +46,19 @@
         >
       </div>
     </div>
+  </div>
+
+  <br />
+  <div class="text-center">
+    <button
+      class="btn btn-sm btn-danger"
+      (click)="deleteSentence(currentSentenceDoc)"
+    >
+      Löschen
+    </button>
+    <span class="px-2"></span>
+    <button class="btn btn-sm btn-primary" (click)="addLabeledSentence()">
+      Speichern
+    </button>
   </div>
 </div>
