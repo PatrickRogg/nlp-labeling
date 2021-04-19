@@ -23,6 +23,7 @@
       class="col-auto my-2"
       (click)="toggleSelection(i)"
       *ngFor="let word of currentLabeledSentence.words; let i = index"
+      style="cursor: pointer;"
     >
       <div [ngClass]="{ 'bg-primary': isInRange(i) }">
         {{ word }}

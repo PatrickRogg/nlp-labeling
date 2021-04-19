@@ -66,6 +66,10 @@ export class AppComponent {
       return;
     }
 
+    if (!this.selectionEnd) {
+      this.selectionEnd = this.selectionStart;
+    }
+
     for (let i = this.selectionStart; i <= this.selectionEnd; i++) {
       let label = suffix;
 
