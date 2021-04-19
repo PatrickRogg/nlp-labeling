@@ -62,7 +62,7 @@ export class AppComponent {
   }
 
   label(suffix: string) {
-    if (!this.selectionStart) {
+    if (!this.selectionStart === null) {
       return;
     }
 
