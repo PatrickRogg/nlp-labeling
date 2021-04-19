@@ -91,8 +91,13 @@ export class AppComponent {
   }
 
   toggleSelection(i: number) {
-    if (this.selectionStart) {
+    if (this.selectionStart !== null) {
       this.selectionEnd = i;
+
+      if (this.selectionStart > this.selectionEnd) {
+        this.selectionEnd = this.selectionStart;
+        this.selectionStart = i;
+      }
     } else {
       this.selectionStart = i;
     }
@@ -117,7 +122,7 @@ export class AppComponent {
   }
 
   isInRange(i: number) {
-    if (this.selectionStart && this.selectionEnd) {
+    if (this.selectionStart !== null && this.selectionEnd !== null) {
       return i >= this.selectionStart && i <= this.selectionEnd;
     }
 

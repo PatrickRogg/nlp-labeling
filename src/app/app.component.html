@@ -1,21 +1,40 @@
-<div class="container mt-5" *ngIf="currentLabeledSentence">
+<div class="container" *ngIf="currentLabeledSentence">
   <h2 class="text-center">
     {{ i }}
   </h2>
   <div class="row mb-3">
     <div class="col-12 text-center">
-      <span class="me-3"> <strong>p</strong> drücken für Produkt </span>
-      <span class="me-3"> <strong>c</strong> drücken für Fähigkeit </span>
-      <span class="me-3"> <strong>o</strong> drücken für Anderes </span>
+      <button class="btn btn-sm btn-warning" (click)="label('PRO')">
+        Produkt
+      </button>
+      <span class="px-2"></span>
+      <button class="btn btn-sm btn-success" (click)="label('CAP')">
+        Fähigkeit
+      </button>
+      <span class="px-2"></span>
+      <button class="btn btn-sm btn-light" (click)="label('O')">
+        Anderes
+      </button>
+      <br>
+      <br>
+      <button
+        class="btn btn-sm btn-secondary"
+        (click)="this.selectionStart = null; this.selectionEnd = null"
+      >
+        Zurücksetzen
+      </button>
       <br />
-      <span class="me-3">
-        <strong>Escape</strong> drücken um Auswahl zurücksetzen
-      </span>
-      <span class="me-3"> <strong>Enter</strong> drücken um Speichern </span>
-      <br />
-      <span class="me-3">
-        <strong>d</strong> drücken zum Löschen des Satzes
-      </span>
+      <br>
+      <button
+        class="btn btn-sm btn-danger"
+        (click)="deleteSentence(currentSentenceDoc)"
+      >
+        Löschen
+      </button>
+      <span class="px-2"></span>
+      <button class="btn btn-sm btn-primary" (click)="addLabeledSentence()">
+        Speichern
+      </button>
     </div>
   </div>
   <div class="row">
@@ -23,7 +42,7 @@
       class="col-auto my-2"
       (click)="toggleSelection(i)"
       *ngFor="let word of currentLabeledSentence.words; let i = index"
-      style="cursor: pointer;"
+      style="cursor: pointer"
     >
       <div [ngClass]="{ 'bg-primary': isInRange(i) }">
         {{ word }}
