@@ -1,14 +1,16 @@
-<div class="container" *ngIf="currentLabeledSentence">
-  <h2 class="text-center">
-    {{ i }}
-  </h2>
-  <div class="row mb-3">
+<nav class="navbar fixed-top navbar-light bg-light">
+  <div class="row mb-3 justify-content-center w-100">
+    <div class="col-12">
+      <h2 class="text-center">
+        {{ i }}
+      </h2>
+    </div>
     <div class="col-12 text-center">
       <button class="btn btn-sm btn-warning" (click)="label('PRO')">
         Produkt
       </button>
       <span class="px-2"></span>
-      <button class="btn btn-sm btn-success" (click)="label('CAP')">
+      <button class="btn btn-sm btn-success" (click)="label('SKILL')">
         Fähigkeit
       </button>
       <span class="px-2"></span>
@@ -24,41 +26,38 @@
       <br />
     </div>
   </div>
-  <div class="row">
+</nav>
+
+<div class="container" *ngIf="currentCompany" style="margin-top: 190px">
+  <div
+    class="row"
+    *ngFor="let labeledSentence of currentCompany.sentences; let i = index"
+    style="cursor: pointer"
+  >
     <div
       class="col-auto my-2"
-      (click)="toggleSelection(i)"
-      *ngFor="let word of currentLabeledSentence.words; let i = index"
-      style="cursor: pointer"
+      *ngFor="let word of labeledSentence.words; let j = index"
+      (click)="toggleSelection(i, j)"
     >
-      <div [ngClass]="{ 'bg-primary': isInRange(i) }">
+      <div [ngClass]="{ 'bg-primary': isInRange(i, j) }">
         {{ word }}
       </div>
       <div>
         <span
           class="badge rounded-pill"
           [ngClass]="{
-            'bg-warning': currentLabeledSentence.labels[i].includes('PRO'),
-            'bg-success': currentLabeledSentence.labels[i].includes('CAP'),
-            'bg-light text-dark': currentLabeledSentence.labels[i] === 'O'
+            'bg-warning': labeledSentence.labels[j].includes('PRO'),
+            'bg-success': labeledSentence.labels[j].includes('SKILL'),
+            'bg-light text-dark': labeledSentence.labels[j] === 'O'
           }"
-          >{{ currentLabeledSentence.labels[i] }}</span
+          >{{ labeledSentence.labels[j] }}</span
         >
       </div>
     </div>
   </div>
 
   <br />
-  <div class="text-center">
-    <button
-      class="btn btn-sm btn-danger"
-      (click)="deleteSentence(currentSentenceDoc)"
-    >
-      Löschen
-    </button>
-    <span class="px-2"></span>
-    <button class="btn btn-sm btn-primary" (click)="addLabeledSentence()">
-      Speichern
-    </button>
+  <div class="text-center mb-5">
+    <button class="btn btn btn-primary" (click)="save()">Speichern</button>
   </div>
 </div>

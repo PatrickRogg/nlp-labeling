@@ -11,58 +11,45 @@ import {
 })
 export class AppComponent {
   i = 0;
-  currentLabeledSentence: any = null;
   selectionStart: any = null;
   selectionEnd: any = null;
-  currentSentenceDoc: any = null;
+  selectedSentenceIndex: any = null;
+  currentCompany: any = null;
 
   constructor(private firestore: AngularFirestore) {
-    this.getTodoSentence();
+    this.getNextPreLabeledData();
   }
 
-  async getTodoSentence() {
+  async getNextPreLabeledData() {
     const snapshot = await this.firestore
-      .collection('sentences')
+      .collection('pre-labeled-data')
       .ref.limit(1)
+      .where('isLabeled', '==', false)
       .get();
 
-    this.currentSentenceDoc = <QueryDocumentSnapshot<any>>snapshot.docs[0];
-    this.setNextCurrentSentence(this.currentSentenceDoc);
+    this.currentCompany = <QueryDocumentSnapshot<any>>snapshot.docs[0].data();
+    window.scrollTo(0, 0);
   }
 
-  async addLabeledSentence() {
-    this.firestore
-      .collection('labeled-sentences')
-      .doc(this.currentLabeledSentence.id)
-      .set(this.currentLabeledSentence);
-    await this.deleteSentence(this.currentSentenceDoc);
+  async save() {
+    this.currentCompany['isLabeled'] = true;
+
+    await this.firestore
+      .collection('pre-labeled-data')
+      .doc(this.currentCompany.id)
+      .set(this.currentCompany);
+
+    await this.firestore
+      .collection('labeled-data')
+      .doc(this.currentCompany.id)
+      .set(this.currentCompany);
     this.i++;
-  }
-
-  async deleteSentence(sentenceDoc: QueryDocumentSnapshot<any>) {
-    await sentenceDoc.ref.delete();
-    this.getTodoSentence();
-    this.selectionStart = null;
-    this.selectionEnd = null;
-  }
-
-  setNextCurrentSentence(sentenceDoc: QueryDocumentSnapshot<any>) {
-    const sentence = sentenceDoc.data();
-    const labels = [];
-
-    for (const word of sentence['words']) {
-      labels.push('O');
-    }
-
-    this.currentLabeledSentence = {
-      id: sentence['id'],
-      words: sentence['words'],
-      labels: labels,
-    };
+    this.getNextPreLabeledData();
+    this.resetSelection();
   }
 
   label(suffix: string) {
-    if (!this.selectionStart === null) {
+    if (this.selectionStart === null || this.selectedSentenceIndex === null) {
       return;
     }
 
@@ -73,9 +60,17 @@ export class AppComponent {
     for (let i = this.selectionStart; i <= this.selectionEnd; i++) {
       let label = suffix;
 
-      if (i === this.selectionStart) {
+      if (suffix === 'O') {
+
+      } else if (this.selectionStart === this.selectionEnd) {
+        label = 'U-' + label;
+      } else if (i === this.selectionStart) {
         if (suffix !== 'O') {
           label = 'B-' + label;
+        }
+      } else if (i == this.selectionEnd) {
+        if (suffix !== 'O') {
+          label = 'L-' + label;
         }
       } else {
         if (suffix !== 'O') {
@@ -83,23 +78,23 @@ export class AppComponent {
         }
       }
 
-      this.currentLabeledSentence.labels[i] = label;
+      this.currentCompany.sentences[this.selectedSentenceIndex].labels[i] = label;
     }
 
-    this.selectionStart = null;
-    this.selectionEnd = null;
+    this.resetSelection();
   }
 
-  toggleSelection(i: number) {
+  toggleSelection(sentenceIndex: number, wordIndex: number) {
+    this.selectedSentenceIndex = sentenceIndex;
     if (this.selectionStart !== null) {
-      this.selectionEnd = i;
+      this.selectionEnd = wordIndex;
 
       if (this.selectionStart > this.selectionEnd) {
         this.selectionEnd = this.selectionStart;
-        this.selectionStart = i;
+        this.selectionStart = wordIndex;
       }
     } else {
-      this.selectionStart = i;
+      this.selectionStart = wordIndex;
     }
   }
 
@@ -107,25 +102,30 @@ export class AppComponent {
   keyEvent(event: KeyboardEvent) {
     if (event.key === 'p') {
       this.label('PRO');
-    } else if (event.key === 'c') {
-      this.label('CAP');
+    } else if (event.key === 's') {
+      this.label('SKILL');
     } else if (event.key === 'o') {
       this.label('O');
-    } else if (event.key === 'd') {
-      this.deleteSentence(this.currentSentenceDoc);
     } else if (event.key === 'Escape') {
-      this.selectionStart = null;
-      this.selectionEnd = null;
-    } else if (event.key === 'Enter') {
-      this.addLabeledSentence();
+      this.resetSelection();
     }
   }
 
-  isInRange(i: number) {
-    if (this.selectionStart !== null && this.selectionEnd !== null) {
-      return i >= this.selectionStart && i <= this.selectionEnd;
+  private resetSelection() {
+    this.selectionStart = null;
+    this.selectionEnd = null;
+    this.selectedSentenceIndex = null;
+  }
+
+  isInRange(sentenceIndex: number, wordIndex: number) {
+    if (sentenceIndex !== this.selectedSentenceIndex) {
+      return false;
     }
 
-    return i === this.selectionStart;
+    if (this.selectionStart !== null && this.selectionEnd !== null) {
+      return wordIndex >= this.selectionStart && wordIndex <= this.selectionEnd;
+    }
+
+    return wordIndex === this.selectionStart;
   }
 }
